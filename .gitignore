@@ -50,3 +50,6 @@ perf
 *.onnx
 synset.txt
 cat.jpg
+
+# Mac OS X
+.DS_Store
