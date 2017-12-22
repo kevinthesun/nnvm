@@ -197,7 +197,8 @@ NNVM_REGISTER_ELEMWISE_BINARY_OP(elemwise_div)
     // grad_1 = - grad_y * n0 / n1^2
     NodeEntry sub0 = MakeNode("elemwise_mul", n->attrs.name + "_grad_sub_0",
                               {ograds[0], n->inputs[0]});
-    NodeEntry sub1 = MakeNode("negative", n->attrs.name + "_grad_sub_1", {sub0});
+    NodeEntry sub1 = MakeNode("negative", n->attrs.name + "_grad_sub_1",
+                              {sub0});
     NodeEntry sub2 = MakeNode("elemwise_mul", n->attrs.name + "_grad_sub_2",
                               {n->inputs[1], n->inputs[1]});
     return std::vector<NodeEntry>{
@@ -247,13 +248,6 @@ NNVM_REGISTER_INIT_OP(fill)
 )code"  NNVM_ADD_FILELINE)
 .set_support_level(1);
 
-// Generate constant one
-NNVM_REGISTER_INIT_OP(__one__)
-.describe(R"code(Return constant value one
-
-)code"  NNVM_ADD_FILELINE)
-.set_support_level(1);
-
 // Generate constant zero
 NNVM_REGISTER_INIT_OP(__zero__)
 .describe(R"code(Return constant value zero
@@ -263,6 +257,12 @@ NNVM_REGISTER_INIT_OP(__zero__)
 
 NNVM_REGISTER_INIT_OP(_zeros)
 .describe(R"code(fill target with zeros
+
+)code"  NNVM_ADD_FILELINE)
+.set_support_level(1);
+
+NNVM_REGISTER_INIT_OP(_ones)
+.describe(R"code(fill target with ones
 
 )code"  NNVM_ADD_FILELINE)
 .set_support_level(1);
@@ -287,6 +287,21 @@ as the input array
 
 NNVM_REGISTER_ELEMWISE_UNARY_OP(zeros_like)
 .describe(R"code(Return an array of zeros with the same shape and type
+as the input array.
+
+)code")
+.add_argument("data", "Symbol", "The input")
+.set_attr<FGradient>(
+  "FGradient", [](const NodePtr& n,
+                  const std::vector<NodeEntry>& ograds){
+    return std::vector<NodeEntry>{
+      MakeNode("zeros_like", n->attrs.name + "_grad",
+               {n->inputs[0]})
+    };
+});
+
+NNVM_REGISTER_ELEMWISE_UNARY_OP(ones_like)
+.describe(R"code(Return an array of ones with the same shape and type
 as the input array.
 
 )code")
@@ -388,8 +403,10 @@ NNVM_REGISTER_ELEMWISE_BINARY_SCALAR(__rdiv_scalar__)
     // y = scalar / n0
     // grad_0 = - grad_y * scalar / n0^2
     NodeEntry sub0 = MakeNode("__mul_scalar__", n->attrs.name + "_grad_sub_0",
-                              {ograds[0]}, {{"scalar", n->attrs.dict["scalar"]}});
-    NodeEntry sub1 = MakeNode("negative", n->attrs.name + "_grad_sub_1", {sub0});
+                              {ograds[0]},
+                              {{"scalar", n->attrs.dict["scalar"]}});
+    NodeEntry sub1 = MakeNode("negative", n->attrs.name + "_grad_sub_1",
+                              {sub0});
     NodeEntry sub2 = MakeNode("elemwise_mul", n->attrs.name + "_grad_sub_2",
                               {n->inputs[0], n->inputs[0]});
     return std::vector<NodeEntry>{
