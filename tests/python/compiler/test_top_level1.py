@@ -256,6 +256,7 @@ def verify_split(ishape, indices_or_sections, axis):
             out = m.get_output(i, tvm.nd.empty(arr.shape))
             np.testing.assert_allclose(out.asnumpy(), arr, atol=1e-5, rtol=1e-5)
 
+
 def test_split():
     verify_split((2, 3), 2, axis=0)
     verify_split((5, 3), [3], axis=0)

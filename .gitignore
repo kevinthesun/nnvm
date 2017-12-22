@@ -48,6 +48,7 @@ perf
 *.json
 *.params
 *.onnx
+*.h5
 synset.txt
 cat.jpg
 
