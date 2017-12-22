@@ -485,7 +485,7 @@ bool ElementWiseSumType(const NodeAttrs& attrs,
     attrs, in_attrs, out_attrs, -1);
 }
 
-std::vector<nnvm::NodeEntry> ElementWiseSumGrad(
+std::vector<NodeEntry> ElementWiseSumGrad(
     const NodePtr& n,
     const std::vector<NodeEntry>& ograds) {
   // identity constraints in the beginning for easier shape inference.
@@ -497,8 +497,7 @@ std::vector<nnvm::NodeEntry> ElementWiseSumGrad(
     NodePtr id_node = Node::Create();
     id_node->attrs.op = copy_op;
     id_node->inputs = {ograds[0]};
-    ret.push_
-      (NodeEntry{id_node, 0, 0});
+    ret.push_back(NodeEntry{id_node, 0, 0});
   }
   return ret;
 }

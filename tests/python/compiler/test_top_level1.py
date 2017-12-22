@@ -140,6 +140,7 @@ def test_tanh():
     inputs = {'x': (dshape, x)}
     helper(y, inputs, dtype, forward, backward)
 
+
 def test_sigmoid():
     x = sym.Variable("x")
     y = sym.sigmoid(x)
@@ -198,6 +199,7 @@ def test_dense():
         'dense_bias': ((3,),)
     }
     helper(y, inputs, dtype, forward)
+
 
 def test_batchnorm():
     x = sym.Variable("x")
@@ -277,6 +279,7 @@ def verify_squeeze(dshape, axis):
     dtype = "float32"
     inputs = {'x': (dshape, x)}
     helper(y, inputs, dtype, forward)
+
 
 def test_squeeze():
     verify_squeeze((1, 3, 2, 5), None)
