@@ -213,6 +213,7 @@ _convert_map = {
     '_plus_scalar'  : _rename('__add_scalar__'),
     '_rdiv_scalar'  : _rename('__rdiv_scalar__'),
     '_rminus_scalar': _rename('__rsub_scalar__'),
+    '_contrib_MultiBoxPrior' : _rename('multibox_prior'),
     'Activation'    : _activations,
     'BatchNorm'     : _batch_norm,
     'BatchNorm_v1'  : _batch_norm,
@@ -237,7 +238,7 @@ _convert_map = {
     'min_axis'      : _rename('min'),
     'reshape'       : _reshape,
     'sum_axis'      : _rename('sum'),
-    'UpSampling'    : _upsampling
+    'UpSampling'    : _upsampling,
 }
 
 def _convert_symbol(op_name, inputs, attrs,

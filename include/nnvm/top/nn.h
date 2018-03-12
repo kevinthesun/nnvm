@@ -275,6 +275,27 @@ struct UpSamplingParam : public dmlc::Parameter<UpSamplingParam> {
   }
 };
 
+struct MultiBoxPriorParam : public dmlc::Parameter<MultiBoxPriorParam> {
+  Tuple<float> sizes;
+  Tuple<float> ratios;
+  Tuple<float> steps;
+  Tuple<float> offsets;
+  bool clip;
+
+  DMLC_DECLARE_PARAMETER(MultiBoxPriorParam) {
+    DMLC_DECLARE_FIELD(sizes).set_default(Tuple<float>({1.0}))
+      .describe("List of sizes of generated MultiBoxPriores.");
+    DMLC_DECLARE_FIELD(ratios).set_default(Tuple<float>({1.0}))
+      .describe("List of aspect ratios of generated MultiBoxPriores.");
+    DMLC_DECLARE_FIELD(steps).set_default(Tuple<float>({-1.0, -1.0}))
+      .describe("Priorbox step across y and x, -1 for auto calculation.");
+    DMLC_DECLARE_FIELD(offsets).set_default(Tuple<float>({0.5, 0.5}))
+      .describe("Priorbox center offsets, y and x respectively.");
+    DMLC_DECLARE_FIELD(clip).set_default(false)
+      .describe("Whether to clip out-of-boundary boxes.");
+  }
+};
+
 }  // namespace top
 }  // namespace nnvm
 
