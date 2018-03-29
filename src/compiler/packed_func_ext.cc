@@ -10,6 +10,7 @@
 #include <nnvm/compiler/op_attr_types.h>
 #include "./node_attr.h"
 #include "compile_engine.h"
+#include "../top/op_common.h"
 
 namespace tvm {
 namespace runtime {
@@ -95,6 +96,54 @@ TVM_REGISTER_GLOBAL("nnvm._register_schedule")
     op.set_attr<FTVMSchedule>("FTVMSchedule", fschedule, args[2]);
   });
 
+TVM_REGISTER_GLOBAL("nnvm._register_infershape")
+.set_body([](TVMArgs args, TVMRetValue *rv) {
+    PackedFunc* f = new PackedFunc(args[1].operator PackedFunc());
+    Op& op = ::dmlc::Registry<nnvm::Op>::Get()->__REGISTER_OR_GET__(args[0]);
+    auto finfershape = [f](const NodeAttrs& attrs,
+                           std::vector<TShape>* p_in_shapes,
+                           std::vector<TShape>* p_out_shapes) {
+      Array<Array<HalideIR::Expr>> in_shapes;
+/*      Array<dim_t> out_shapes{};
+
+      for (int i = 0; i < p_in_shapes->size(); ++i) {
+        Array
+        in_shapes.push_back(tvm::placeholder());
+      }
+
+      for (int i = 0; i < p_out_shapes->size(); ++i) {
+        Array<dim_t> out_shape{};
+        for (dim_t j = 0; j < p_out_shapes->at(i).ndim(); ++j) {
+          out_shape.push_back(p_out_shapes->at(i)[j]);
+        }
+        out_shapes.push_back(out_shape);
+      }
+
+      return (*f)(GetAttrDict(attrs), in_shapes, out_shapes, p_in_shapes, p_out_shapes);*/
+    };
+    op.set_attr<FInferShape>("FInferShape", finfershape, args[2]);
+  });
+
+/*
+TVM_REGISTER_GLOBAL("nnvm._assign_shape")
+.set_body([](TVMArgs args, TVMRetValue *rv) {
+    NodeAttrs* attrs = args[0];
+    TShape* p_shape = static_cast<TShape*>((void*)(args[1]));
+    int index = args[2];
+    bool is_input = args[3];
+    Array<dim_t>* shape_array = args[4];
+
+    TShape shape(shape_array->size());
+    for (int i = 0; i < shape.ndim(); ++i) {
+      shape[i] = (*shape_array)[i];
+    }
+    if (!SHAPE_ASSIGN(*p_shape, shape)) {                                \
+      LOG(FATAL) << attr_assign_error_msg(attrs, index, false, shape,    \
+                                          (p_shape)[index], "shape");    \
+    }
+  });
+  */
+
 TVM_REGISTER_GLOBAL("nnvm._register_pattern")
 .set_body([](TVMArgs args, TVMRetValue *rv) {
     Op& op = ::dmlc::Registry<nnvm::Op>::Get()->__REGISTER_OR_GET__(args[0]);
@@ -119,5 +168,7 @@ TVM_REGISTER_GLOBAL("nnvm.graph._move_graph")
       *rv = nullptr;
     }
   });
+
+
 }  // namespace compiler
 }  // namespace nnvm

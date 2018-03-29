@@ -33,8 +33,8 @@ inline bool Pool2DInferShape(const nnvm::NodeAttrs& attrs,
   dshape = ConvertLayout(dshape, param.layout, kNCHW);
 
   TShape oshape = dshape;
-  CHECK_EQ(dshape.ndim(), 4U)
-      << "Pooling: Input data should be 4D";
+  // CHECK_EQ(dshape.ndim(), 4U)
+  //    << "Pooling: Input data should be 4D";
   CHECK(param.pool_size[0] <= dshape[2] + 2 * param.padding[0])
       << "pool size (" << param.pool_size[0] << ") exceeds input (" << dshape[2]
       << " padded to " << (dshape[2] + 2*param.padding[0]) << ")";
@@ -53,7 +53,7 @@ inline bool Pool2DInferShape(const nnvm::NodeAttrs& attrs,
     oshape[3] = ((dshape[3] + 2 * param.padding[1] - param.pool_size[1] +
                   param.strides[1] - 1) / param.strides[1]) + 1;
   }
-  oshape = ConvertLayout(oshape, kNCHW, param.layout);
+  //oshape = ConvertLayout(oshape, kNCHW, param.layout);
   NNVM_ASSIGN_OUTPUT_SHAPE(attrs, *out_shape, 0, oshape);
   return true;
 }
@@ -174,10 +174,10 @@ inline bool GlobalPool2DInferShape(const nnvm::NodeAttrs& attrs,
   CHECK_EQ(out_shape->size(), 1U);
   TShape dshape = (*in_shape)[0];
   if (dshape.ndim() ==  0) return false;
-  dshape = ConvertLayout(dshape, param.layout, kNCHW);
+  //dshape = ConvertLayout(dshape, param.layout, kNCHW);
   TShape oshape = dshape;
   oshape[2] = oshape[3] = 1;
-  oshape = ConvertLayout(oshape, kNCHW, param.layout);
+  //oshape = ConvertLayout(oshape, kNCHW, param.layout);
   NNVM_ASSIGN_OUTPUT_SHAPE(attrs, *out_shape, 0, oshape);
   return true;
 }
