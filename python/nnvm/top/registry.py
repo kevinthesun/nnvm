@@ -26,6 +26,7 @@ _register_compute = tvm.get_global_func("nnvm._register_compute")
 _register_schedule = tvm.get_global_func("nnvm._register_schedule")
 _register_infershape = tvm.get_global_func("nnvm._register_infershape")
 _register_pattern = tvm.get_global_func("nnvm._register_pattern")
+_assign_shape = tvm.get_global_func("nnvm._assign_shape")
 
 def register_compute(op_name, f=None, level=10):
     """Register compute function for operator
@@ -120,3 +121,8 @@ def register_pattern(op_name, pattern, level=10):
         The priority level
     """
     _register_pattern(op_name, pattern, level)
+
+
+def assign_shape(p_shape, index, is_input, shape):
+    _assign_shape(p_shape, index, is_input, shape)
+
