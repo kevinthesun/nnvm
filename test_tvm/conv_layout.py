@@ -47,6 +47,7 @@ def compute_max_pool_2d_nChwc(attrs, inputs, _):
     layout = attrs["layout"]
 
     if len(inputs[0].shape) == 4:
+        print("pooling pack")
         return nn.pool(inputs[0], kernel,
                        strides, padding, "max", ceil_mode, layout)
 

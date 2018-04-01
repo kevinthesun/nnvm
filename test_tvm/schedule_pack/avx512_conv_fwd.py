@@ -32,6 +32,19 @@ _WORKLOADS = [
     Workload('float32', 'float32', 128, 128, 256, 256, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 64, 64, 256, 512, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 64, 64, 512, 512, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 512, 512, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 512, 1024, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 1024, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 1, 1, 1024, 20, 1, 1, 0, 0, 1, 1),
+"""
+    Workload('float32', 'float32', 512, 512, 3, 64, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 512, 512, 64, 64, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 256, 256, 64, 128, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 256, 256, 128, 128, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 128, 128, 128, 256, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 128, 128, 256, 256, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 64, 64, 256, 512, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 64, 64, 512, 512, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 64, 64, 512, 84, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 32, 32, 512, 512, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 32, 32, 512, 1024, 3, 3, 6, 6, 1, 1),
@@ -50,12 +63,26 @@ _WORKLOADS = [
     Workload('float32', 'float32', 16, 16, 512, 24, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 8, 8, 256, 24, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 32, 32, 512, 1024, 3, 3, 1, 1, 1, 1),
+"""
 ]
 
 _SCHEDULES = [
     # SSD VGG16
+    AVX512ConvCommonFwd(ic_bn=3, oc_bn=16, reg_n=64, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=16, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=128, oh_factor=1, ow_factor=2),
+    AVX512Conv1x1Fwd(ic_bn=128, oc_bn=20, oh_factor=1, ow_factor=1),
+"""
     AVX512ConvCommonFwd(ic_bn=3, oc_bn=8, reg_n=64, unroll_kw=True),
-    AVX512ConvCommonFwd(ic_bn=32, oc_bn=16, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=16, reg_n=16, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=8, oc_bn=16, reg_n=16, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=1, oc_bn=32, reg_n=8, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=16, oc_bn=16, reg_n=16, unroll_kw=True),
@@ -80,6 +107,7 @@ _SCHEDULES = [
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=8, reg_n=8, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=6, reg_n=8, unroll_kw=False),
     AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+"""
 ]
 
 
@@ -131,6 +159,7 @@ def _declare_conv2d(data, kernel, num_filter, kernel_size, stride, padding, bias
             data_pad = data
         data_vec = tvm.compute(shape, lambda n, C, h, w, c:
                                data_pad[n, C * sch.ic_bn + c, h, w], tag='conv2d_data_pack')
+        print("Workload %s needs pack" % str(wkl))
     else:
         if DOPAD:
             data_pad = nn.pad(data, (0, 0, padding[0], padding[1], 0), name="data_pad")
@@ -140,6 +169,7 @@ def _declare_conv2d(data, kernel, num_filter, kernel_size, stride, padding, bias
             data_vec = tvm.compute(shape, lambda n, C, h, w, c:
                                    data_pad[n, (C * sch.ic_bn + c) // ic_block, h, w, (C * sch.ic_bn + c) % ic_block],
                                    tag='conv2d_data_pack')
+            print("Workload %s needs pack" % str(wkl))
         else:
             data_vec = data_pad
 
@@ -147,7 +177,6 @@ def _declare_conv2d(data, kernel, num_filter, kernel_size, stride, padding, bias
 
     if bias is not None:
         expand_axis = 1
-        bias = topi.reshape(bias, (oc // sch.oc_bn, sch.oc_bn))
         bias = topi.expand_dims(bias, axis=expand_axis, num_newaxis=2)
         out = topi.broadcast_add(out, bias)
     return out
@@ -171,7 +200,7 @@ def compute_conv2d(attrs, inputs, _):
     return out
 
 
-def schedule_conv2d_nChwc(padding, strides, num_filter, kernel_size, outs):
+def schedule_conv2d_nChwc(padding, strides, num_filter, kernel_size, use_bias, outs):
     """Create schedule for tensors"""
     s = tvm.create_schedule([x.op for x in outs])
 
@@ -188,10 +217,9 @@ def schedule_conv2d_nChwc(padding, strides, num_filter, kernel_size, outs):
         if 'conv2d' in op.tag:
             output = op.output(0)
             conv_out = output
-            kernel_vec = conv_out.op.input_tensors[1]
             data_vec = conv_out.op.input_tensors[0]
             DOPAD = padding[0] != 0 or padding[1] != 0
-            data_pad = data_vec.op.input_tensors[0] if "conv2d_data_pack" in data_vec.op.tag else data_vec
+            data_pad = data_vec.op.input_tensors[0] if hasattr(data_vec.op, 'tag') and "conv2d_data_pack" in data_vec.op.tag else data_vec
             data = data_pad.op.input_tensors[0] if DOPAD else data_pad
 
             if len(data.shape) == 5:
@@ -207,8 +235,8 @@ def schedule_conv2d_nChwc(padding, strides, num_filter, kernel_size, outs):
 
             wkl = _get_workload(original_data, original_kernel, strides, padding, output.dtype)
             sch = _get_schedule(wkl)
-            _SCH_TO_SCH_FUNC[type(sch)](s, data_pad, data_vec, wkl, sch, kernel_vec, conv_out)
-
+            _SCH_TO_SCH_FUNC[type(sch)](s, data_pad, data_vec, wkl, sch, conv_out, op.output(0), outs[0])
+   
 
     traverse(outs[0].op)
     return s
@@ -221,7 +249,8 @@ def schedule_conv2d(attrs, outs, target):
         strides = attrs.get_int_tuple("strides")
         channels = attrs.get_int("channels")
         kernel_size = attrs.get_int_tuple("kernel_size")
-        return schedule_conv2d_nChwc(padding, strides, channels, kernel_size, outs)
+        use_bias = attrs.get_bool("use_bias")
+        return schedule_conv2d_nChwc(padding, strides, channels, kernel_size, use_bias, outs)
 
 
 @reg.register_infershape("conv2d", level=20)
@@ -247,8 +276,8 @@ def infer_shape_conv2d(attrs, in_shapes, p_in_shapes, p_out_shapes):
     out_width = (in_width + 2 * padding[1] - kernel_size[1]) // strides[1] + 1
 
     out_shape = (batch_size, channels // sch.oc_bn, out_height, out_width, sch.oc_bn)
-    kernel_shape = (channels, in_channels, kernel_size[0], kernel_size[1])
-    bias_shape = (channels,)
+    kernel_shape = (channels // sch.oc_bn, in_channels // sch.ic_bn, kernel_size[0], kernel_size[1], sch.ic_bn, sch.oc_bn) if kernel_size[0] != 1 or kernel_size[1] != 1 else (channels // sch.oc_bn, in_channels // sch.ic_bn, sch.ic_bn, sch.oc_bn, kernel_size[0], kernel_size[1])
+    bias_shape = (channels // sch.oc_bn, sch.oc_bn)
 
     if attrs.get_bool("use_bias"):
         reg.assign_shape(p_in_shapes, 2, True, bias_shape)
