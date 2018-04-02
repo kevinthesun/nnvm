@@ -64,7 +64,7 @@ image_shape = (3, 512, 512)
 data_shape = (batch_size,) + image_shape
 
 
-_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_512', 0)
+#_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_512', 0)
 sym = get_symbol('vgg16_reduced', 512, num_classes=20)
 
 mod = mx.mod.Module(symbol=sym, context=mx.cpu(), label_names=None)
@@ -100,9 +100,13 @@ mx_data = mx.nd.array(data_array)
 np.testing.assert_array_almost_equal(tvm_data.asnumpy(), mx_data.asnumpy(), decimal=6)
 mod.forward(Batch(data=[mx_data]), is_train=False)
 mx_out = mod.get_outputs()[0]
+print(mx_out.shape)
+tvm_out = module.get_output(0, out=tvm.nd.empty((batch_size, 98304)))
+#_, _, oh, ow, _ = tvm_out.asnumpy().shape
+#np_tvm_out = np.transpose(tvm_out.asnumpy(), (0, 1, 4, 2, 3))
+#np_tvm_out = np.reshape(np_tvm_out, (batch_size, -1, oh, ow))
+np_tvm_out = tvm_out.asnumpy()
 
-tvm_out = module.get_output(0, out=tvm.nd.empty((batch_size, 20)))
-
-np.testing.assert_array_almost_equal(tvm_out.asnumpy(), mx_out.asnumpy(), decimal=3)
+np.testing.assert_array_almost_equal(np_tvm_out, mx_out.asnumpy(), decimal=3)
 
 print("TVM %s inference time for batch size of %d: %f" % ('ssd_resnet50', batch_size, tvm_time))

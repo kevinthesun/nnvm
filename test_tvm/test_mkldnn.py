@@ -15,7 +15,7 @@ data_shape = (batch_size,) + image_shape
 data_array = np.random.uniform(0, 255, size=data_shape).astype("float32")
 mx_data = mx.nd.array(data_array)
 
-_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_512', 0)
+#_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_512', 0)
 
 sym = get_symbol('vgg16_reduced', 512, num_classes=20)
 #sym.save("ssd-symbol.json")
@@ -34,14 +34,11 @@ for _ in range(100):
         output.wait_to_read()
 
 
-mkl_time = 0
+s = time.time()
 for _ in range(run_times):
-    data_array = np.random.uniform(0, 255, size=data_shape).astype("float32")
-    mx_data = mx.nd.array(data_array)
-    s = time.time()
     mod.forward(Batch(data=[mx_data]), is_train=False)
     for output in mod.get_outputs():
         output.wait_to_read()
-    mkl_time += time.time() - s
+mkl_time = time.time() - s
 print(mod.get_outputs()[0].shape)
 print("MKL %s inference time for batch size of %d: %f" % ('ssd_resnet50', batch_size, mkl_time))

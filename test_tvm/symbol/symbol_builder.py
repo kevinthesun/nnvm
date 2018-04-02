@@ -174,9 +174,9 @@ def get_symbol(network, num_classes, from_layers, num_filters, sizes, ratios,
     loc_preds, cls_preds, anchor_boxes = multibox_layer(layers, \
         num_classes, sizes=sizes, ratios=ratios, normalization=normalizations, \
         num_channels=num_filters, clip=False, interm_layer=0, steps=steps)
-    cls_prob = mx.symbol.softmax(data=cls_preds, axis=1, \
-        name='cls_prob')
-    out = mx.symbol.contrib.MultiBoxDetection(*[cls_prob, loc_preds, anchor_boxes], \
-        name="detection", nms_threshold=nms_thresh, force_suppress=force_suppress,
-        variances=(0.1, 0.1, 0.2, 0.2), nms_topk=nms_topk)
-    return mx.sym.Group([loc_preds, cls_prob, anchor_boxes])
+    #cls_prob = mx.symbol.softmax(data=cls_preds, axis=1, \
+    #    name='cls_prob')
+    #out = mx.symbol.contrib.MultiBoxDetection(*[cls_prob, loc_preds, anchor_boxes], \
+    #    name="detection", nms_threshold=nms_thresh, force_suppress=force_suppress,
+    #    variances=(0.1, 0.1, 0.2, 0.2), nms_topk=nms_topk)
+    return mx.sym.Group([loc_preds , cls_preds , anchor_boxes])

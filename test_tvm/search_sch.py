@@ -21,7 +21,7 @@ def get_factor(i):
     return rtv
         
 
-for i in range(10, 12):
+for i in range(20, 34):
     workload = _WORKLOADS[i]
     isize = workload[2]
     ic = workload[4]

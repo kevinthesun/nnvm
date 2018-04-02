@@ -298,4 +298,4 @@ def multibox_layer(from_layers, num_classes, sizes=[.2, .95],
     anchor_boxes = mx.symbol.Concat(*anchor_layers, \
         num_args=len(anchor_layers), dim=1)
     anchor_boxes = mx.symbol.Reshape(data=anchor_boxes, shape=(0, -1, 4), name="multibox_anchors")
-    return [loc_preds, cls_preds, anchor_boxes]
+    return [loc_preds, cls_preds, anchor_boxes]#[loc_pred_layers, cls_pred_layers, anchor_layers]#[loc_pred_layers, cls_pred_layers, anchor_layers]#[loc_preds, cls_preds, anchor_boxes]#[loc_pred_layers, cls_pred_layers, anchor_layers]

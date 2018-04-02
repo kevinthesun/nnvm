@@ -12,9 +12,50 @@ from topi.nn.conv2d import Workload
 from mxnet import gluon
 from mxnet.gluon.model_zoo.vision import get_model
 from symbol.symbol_factory import get_symbol
-from schedule_pack.avx512_conv_fwd import _WORKLOADS
+#from schedule_pack.avx512_conv_fwd import _WORKLOADS
 
-_WORKLOADS1 = [
+_WORKLOADS = [
+    # SSD VGG16 512 * 512 65-89
+    Workload('float32', 'float32', 512, 512, 3, 64, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 512, 512, 64, 64, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 256, 256, 64, 128, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 256, 256, 128, 128, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 128, 128, 128, 256, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 128, 128, 256, 256, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 64, 64, 256, 512, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 64, 64, 512, 512, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 512, 512, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 512, 1024, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 1024, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 1, 1, 1024, 20, 1, 1, 0, 0, 1, 1),
+    # SSD VGG16 layer3 12-15
+    Workload('float32', 'float32', 32, 32, 1024, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 32, 32, 256, 512, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 16, 16, 512, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 16, 16, 128, 256, 3, 3, 1, 1, 2, 2),
+    # SSD VGG16 layer4 16-17
+    Workload('float32', 'float32', 8, 8, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 8, 8, 128, 256, 3, 3, 1, 1, 2, 2),
+    # SSD VGG16 layer5 18-19
+    Workload('float32', 'float32', 4, 4, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 4, 4, 128, 256, 3, 3, 1, 1, 2, 2),
+    # SSD VGG16 layer6 20-21
+    Workload('float32', 'float32', 2, 2, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 2, 2, 128, 256, 3, 3, 1, 1, 1, 1),
+    # SSD VGG16 loc_pred 22-27
+    Workload('float32', 'float32', 64, 64, 512, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 512, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 256, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 16, 3, 3, 1, 1, 1, 1),
+    # SSD VGG16 cls_prob 28-33
+    Workload('float32', 'float32', 64, 64, 512, 84, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 512, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 256, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 84, 3, 3, 1, 1, 1, 1),
 """
     # workloads of resnet18_v1 on imagenet 12 0-11
     Workload('float32', 'float32', 224, 224, 3, 64, 7, 7, 3, 3, 2, 2),

@@ -59,7 +59,7 @@ def _schedule_conv(s, data_pad, data_vec, wkl, sch, conv_out, output, last):
 
     # schedule conv
 
-    C , O0, O = conv_out, output, last
+    C, O0, O = conv_out, output, last
     CC = s.cache_write(C, 'global')
 
     _, oc_chunk, oh, ow, oc_block = s[C].op.axis
@@ -83,7 +83,7 @@ def _schedule_conv(s, data_pad, data_vec, wkl, sch, conv_out, output, last):
     else:
         s[CC].reorder(oc_chunk, oh, ow_chunk, ic_chunk, kh, kw, ic_block, ow_block, oc_block)
 
-    # s[CC].fuse(oc_chunk, oh)
+    #s[CC].fuse(oc_chunk, oh)
     s[CC].vectorize(oc_block)
     s[CC].unroll(ow_block)
 

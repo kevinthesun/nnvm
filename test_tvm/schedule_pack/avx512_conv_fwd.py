@@ -23,7 +23,7 @@ from topi import tag
 fp32_vec_len = 16
 
 _WORKLOADS = [
-    # SSD VGG16 512 * 512 65-89
+    # SSD VGG16 512 * 512 0-11
     Workload('float32', 'float32', 512, 512, 3, 64, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 512, 512, 64, 64, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 256, 256, 64, 128, 3, 3, 1, 1, 1, 1),
@@ -36,6 +36,34 @@ _WORKLOADS = [
     Workload('float32', 'float32', 32, 32, 512, 1024, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 32, 32, 1024, 1024, 1, 1, 0, 0, 1, 1),
     Workload('float32', 'float32', 1, 1, 1024, 20, 1, 1, 0, 0, 1, 1),
+    # SSD VGG16 layer3 12-15
+    Workload('float32', 'float32', 32, 32, 1024, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 32, 32, 256, 512, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 16, 16, 512, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 16, 16, 128, 256, 3, 3, 1, 1, 2, 2),
+    # SSD VGG16 layer4 16-17
+    Workload('float32', 'float32', 8, 8, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 8, 8, 128, 256, 3, 3, 1, 1, 2, 2),
+    # SSD VGG16 layer5 18-19
+    Workload('float32', 'float32', 4, 4, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 4, 4, 128, 256, 3, 3, 1, 1, 2, 2),
+    # SSD VGG16 layer6 20-21
+    Workload('float32', 'float32', 2, 2, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 2, 2, 128, 256, 3, 3, 1, 1, 1, 1),
+    # SSD VGG16 loc_pred 22-27
+    Workload('float32', 'float32', 64, 64, 512, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 512, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 256, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 16, 3, 3, 1, 1, 1, 1),
+    # SSD VGG16 cls_prob 28-33
+    Workload('float32', 'float32', 64, 64, 512, 84, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 512, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 256, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 84, 3, 3, 1, 1, 1, 1),
 """
     Workload('float32', 'float32', 512, 512, 3, 64, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 512, 512, 64, 64, 3, 3, 1, 1, 1, 1),
@@ -80,6 +108,34 @@ _SCHEDULES = [
     AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
     AVX512Conv1x1Fwd(ic_bn=32, oc_bn=128, oh_factor=1, ow_factor=2),
     AVX512Conv1x1Fwd(ic_bn=128, oc_bn=20, oh_factor=1, ow_factor=1),
+    # 12-15
+    AVX512Conv1x1Fwd(ic_bn=128, oc_bn=16, oh_factor=2, ow_factor=16),
+    AVX512ConvCommonFwd(ic_bn=16, oc_bn=64, reg_n=4, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=64, oh_factor=2, ow_factor=2),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=64, reg_n=4, unroll_kw=True),
+    # 16-17
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=64, oh_factor=1, ow_factor=2),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=64, reg_n=4, unroll_kw=False),
+    # 18-19
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=8, oh_factor=1, ow_factor=4),
+    AVX512ConvCommonFwd(ic_bn=8, oc_bn=64, reg_n=2, unroll_kw=True),
+    # 20-21
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=128, oh_factor=2, ow_factor=2),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=64, reg_n=1, unroll_kw=False),
+    # 22-27
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=16, reg_n=64, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=12, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=12, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=6, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=4, reg_n=4, unroll_kw=False),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=8, reg_n=2, unroll_kw=False),
+    # 28-33
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=12, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=14, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=8, unroll_kw=False),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=4, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=2, unroll_kw=True),
 """
     AVX512ConvCommonFwd(ic_bn=3, oc_bn=8, reg_n=64, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=16, reg_n=16, unroll_kw=True),
@@ -169,6 +225,7 @@ def _declare_conv2d(data, kernel, num_filter, kernel_size, stride, padding, bias
             data_vec = tvm.compute(shape, lambda n, C, h, w, c:
                                    data_pad[n, (C * sch.ic_bn + c) // ic_block, h, w, (C * sch.ic_bn + c) % ic_block],
                                    tag='conv2d_data_pack')
+            print("Input data shape %s" % str(data.shape))
             print("Workload %s needs pack" % str(wkl))
         else:
             data_vec = data_pad
@@ -286,3 +343,24 @@ def infer_shape_conv2d(attrs, in_shapes, p_in_shapes, p_out_shapes):
 
     return True
 
+
+@reg.register_compute("transpose", level=20)
+def compute_transpose(attrs, inputs, _):
+    axis = attrs.get_int_tuple("axes")
+    ishape = inputs[0].shape
+    if len(ishape) > len(axis):
+        for i in range(len(axis), len(ishape)):
+            axis += (i,)
+    
+    return topi.transpose(inputs[0], axis)
+
+@reg.register_infershape("transpose", level=20)
+def infer_shape_transpose(attrs, in_shapes, p_in_shapes, p_out_shapes):
+    axis = attrs.get_int_tuple("axes")
+    ishape = in_shapes[0]
+    if len(ishape) > len(axis):
+        for i in range(len(axis), len(ishape)):
+            axis += (i,)
+    out_shape = tuple([ishape[i].value for i in list(axis)])
+    reg.assign_shape(p_out_shapes, 0, False, out_shape)
+    return True
