@@ -7,7 +7,7 @@ from symbol.symbol_factory import get_symbol
 
 Batch = namedtuple('Batch', ['data'])
 
-run_times = 100
+run_times = 1000
 batch_size = 1
 image_shape = (3, 512, 512)
 data_shape = (batch_size,) + image_shape
@@ -15,15 +15,15 @@ data_shape = (batch_size,) + image_shape
 data_array = np.random.uniform(0, 255, size=data_shape).astype("float32")
 mx_data = mx.nd.array(data_array)
 
-#_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_512', 0)
+_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_resnet50_512', 0)
 
-sym = get_symbol('vgg16_reduced', 512, num_classes=20)
+sym = get_symbol('resnet50', 512, num_classes=20)
 #sym.save("ssd-symbol.json")
 
 mod = mx.mod.Module(symbol=sym, context=mx.cpu(), label_names=None)
 mod.bind(data_shapes=[('data', data_shape)])
-#mod.set_params(arg_params, aux_params, allow_extra=True, allow_missing=True)
-mod.init_params()
+mod.set_params(arg_params, aux_params)
+#mod.init_params()
 
 # Warmup
 data_array = np.random.uniform(0, 255, size=data_shape).astype("float32")

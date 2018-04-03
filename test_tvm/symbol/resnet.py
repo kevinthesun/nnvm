@@ -130,7 +130,7 @@ def resnet(units, num_stages, filter_list, num_classes, image_shape, bottle_neck
     pool1 = mx.symbol.Pooling(data=relu1, global_pool=True, kernel=(7, 7), pool_type='avg', name='pool1')
     flat = mx.symbol.Flatten(data=pool1)
     fc1 = mx.symbol.FullyConnected(data=flat, num_hidden=num_classes, name='fc1')
-    return mx.symbol.SoftmaxOutput(data=fc1, name='softmax')
+    return fc1#mx.symbol.SoftmaxOutput(data=fc1, name='softmax')
 
 def get_symbol(num_classes, num_layers, image_shape, conv_workspace=256, **kwargs):
     """

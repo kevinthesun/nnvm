@@ -60,8 +60,9 @@ BatchNormToInferUnpack(const nnvm::NodeAttrs& attrs,
         "elemwise_add", bn_name + "_add_beta", {shift, beta});
   }
   int axis = param.axis;
-  scale = ExpandBiasToMatchAxis(scale, dshape.ndim(), 1, axis);
-  shift = ExpandBiasToMatchAxis(shift, dshape.ndim(), 1, axis);
+  int expand_dim = dshape.ndim() >= 5 ? dshape.ndim() - 1 : dshape.ndim();
+  scale = ExpandBiasToMatchAxis(scale, expand_dim, 1, axis);
+  shift = ExpandBiasToMatchAxis(shift, expand_dim, 1, axis);
   NodeEntry out = MakeNode("broadcast_mul", bn_name + "_a_mul_data",
                            {data, scale});
   out = MakeNode("broadcast_add", bn_name + "_out",

@@ -83,21 +83,6 @@ _WORKLOADS = [
     Workload('float32', 'float32', 16, 16, 2048, 512, 1, 1, 0, 0, 1, 1),
     Workload('float32', 'float32', 16, 16, 512, 512, 3, 3, 1, 1, 1, 1),
     # SSD Resnet50_v2 others 23-42
-    Workload('float32', 'float32', 16, 16, 2048, 256, 1, 1, 0, 0, 1, 1),
-    Workload('float32', 'float32', 16, 16, 256, 512, 3, 3, 1, 1, 2, 2),
-    Workload('float32', 'float32', 8, 8, 512, 128, 1, 1, 0, 0, 1, 1),
-    Workload('float32', 'float32', 8, 8, 128, 256, 3, 3, 1, 1, 2, 2),
-    Workload('float32', 'float32', 4, 4, 256, 128, 1, 1, 0, 0, 1, 1),
-    Workload('float32', 'float32', 4, 4, 128, 256, 3, 3, 1, 1, 2, 2),
-    Workload('float32', 'float32', 2, 2, 256, 128, 1, 1, 0, 0, 1, 1),
-    Workload('float32', 'float32', 2, 2, 128, 128, 3, 3, 1, 1, 2, 2),
-    Workload('float32', 'float32', 32, 32, 1024, 16, 3, 3, 1, 1, 1, 1),
-    Workload('float32', 'float32', 16, 16, 2048, 24, 3, 3, 1, 1, 1, 1),
-    Workload('float32', 'float32', 8, 8, 512, 24, 3, 3, 1, 1, 1, 1),
-    Workload('float32', 'float32', 4, 4, 256, 24, 3, 3, 1, 1, 1, 1),
-    Workload('float32', 'float32', 2, 2, 256, 16, 3, 3, 1, 1, 1, 1),
-    Workload('float32', 'float32', 1, 1, 128, 16, 3, 3, 1, 1, 1, 1),
-"""
     Workload('float32', 'float32', 32, 32, 1024, 16, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 16, 16, 2048, 24, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 16, 16, 2048, 256, 1, 1, 0, 0, 1, 1),
@@ -118,7 +103,6 @@ _WORKLOADS = [
     Workload('float32', 'float32', 4, 4, 256, 126, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 2, 2, 256, 84, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 1, 1, 128, 84, 3, 3, 1, 1, 1, 1),   
-"""
 """
     # workloads of resnet18_v1 on imagenet 12 0-11
     Workload('float32', 'float32', 224, 224, 3, 64, 7, 7, 3, 3, 2, 2),
@@ -209,13 +193,14 @@ def get_conv2d_workload(model, in_dtype='float32', out_dtype='float32'):
         workload_set.add(workload)
 
     for node in node_list:
-        if node['op'] != 'conv2d':
+        if node['op'] != 'elemwise_add':
             continue
-        attrs = node["attrs"]
-        if int(attrs["groups"]) != 1:
-            continue
-        input_index = node["inputs"][0][0]
-        input_shape = shape_list[node_map[input_index]]
+        input_index_0 = node["inputs"][0][0]
+        input_index_1 = node["inputs"][1][0]
+       
+        input_conv_index = node_list[input_index_0]["inputs"][0][0]
+        input_shape = shape_list[node_map[input_conv_index]]
+        attrs = node_list[input_index_0]["attrs"]
         if attrs["layout"] == "NCHW":
             height, width, in_filter = input_shape[2], input_shape[3], input_shape[1]
         else:
@@ -225,12 +210,25 @@ def get_conv2d_workload(model, in_dtype='float32', out_dtype='float32'):
         hpad, wpad = (attrs["padding"])[1:-1].split(',')
         hstride, wstride = (attrs["strides"])[1:-1].split(',')
 
-        workload = Workload(*[in_dtype, out_dtype, height, width, in_filter, int(out_filter),
+        workload_0 = Workload(*[in_dtype, out_dtype, height, width, in_filter, int(out_filter),
                               int(hkernel), int(wkernel), int(hpad), int(wpad), int(hstride), int(wstride)])
-        #print(workload)
-        if workload not in workload_set:
-            workload_set.add(workload)
-            workload_list.append(workload)
+        
+        input_conv_index = node_list[input_index_1]["inputs"][0][0]
+        input_shape = shape_list[node_map[input_conv_index]]
+        print(node_list[input_index_1])
+        attrs = node_list[input_index_1]["attrs"]
+        if attrs["layout"] == "NCHW":
+            height, width, in_filter = input_shape[2], input_shape[3], input_shape[1]
+        else:
+            height, width, in_filter = input_shape[1], input_shape[2], input_shape[3]
+        out_filter = attrs["channels"]
+        hkernel, wkernel = (attrs["kernel_size"])[1:-1].split(',')
+        hpad, wpad = (attrs["padding"])[1:-1].split(',')
+        hstride, wstride = (attrs["strides"])[1:-1].split(',')
+
+        workload_1 = Workload(*[in_dtype, out_dtype, height, width, in_filter, int(out_filter),
+                              int(hkernel), int(wkernel), int(hpad), int(wpad), int(hstride), int(wstride)])
+        print("%d, %d" % (_WORKLOADS.index(workload_0), _WORKLOADS.index(workload_1)))
 
     return workload_list
 

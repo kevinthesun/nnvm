@@ -54,6 +54,25 @@ def weight_prepack(net, params):
             oc, = params[bias_name].asnumpy().shape
             params[bias_name] = tvm.nd.array(np.reshape(params[bias_name].asnumpy(), (oc // oc_bn, oc_bn)))
 
+    for node in node_list:
+        if node['op'] != 'batch_norm' or node['name'] == "batch_norm0":
+            continue
+        gamma_index = node["inputs"][1][0]
+        beta_index = node["inputs"][2][0]
+        mm_index = node["inputs"][3][0]
+        mv_index = node["inputs"][4][0]
+
+        gamma_name = node_list[gamma_index]['name']
+        beta_name = node_list[beta_index]['name']
+        mm_name = node_list[mm_index]['name']
+        mv_name = node_list[mv_index]['name']
+
+        _, _, _, _, oc_bn = input_shape = shape_list[node_map[node["inputs"][0][0]]]
+        oc, = params[gamma_name].asnumpy().shape
+        for key in [gamma_name, beta_name, mm_name, mv_name]:
+            params[key] = tvm.nd.array(np.reshape(params[key].asnumpy(), (oc // oc_bn, oc_bn)))
+
+
 Batch = namedtuple('Batch', ['data'])
 
 run_times = 100
@@ -64,13 +83,13 @@ image_shape = (3, 512, 512)
 data_shape = (batch_size,) + image_shape
 
 
-#_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_512', 0)
-sym = get_symbol('vgg16_reduced', 512, num_classes=20)
+_, arg_params, aux_params = mx.model.load_checkpoint('model/ssd_resnet50_512', 0)
+sym = get_symbol('resnet50', 512, num_classes=20)
 
 mod = mx.mod.Module(symbol=sym, context=mx.cpu(), label_names=None)
 mod.bind(data_shapes=[('data', data_shape)])
-#mod.set_params(arg_params, aux_params, allow_extra=True, allow_missing=True)
-mod.init_params()
+mod.set_params(arg_params, aux_params)
+#mod.init_params()
 
 #print(arg_params)
 net, params = nnvm.frontend.from_mxnet(sym, mod.get_params()[0], mod.get_params()[1])

@@ -23,6 +23,81 @@ from topi import tag
 fp32_vec_len = 16
 
 _WORKLOADS = [
+    # SSD Resnet50_v2 0-22
+    Workload('float32', 'float32', 512, 512, 3, 64, 7, 7, 3, 3, 2, 2),
+    Workload('float32', 'float32', 128, 128, 64, 64, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 128, 128, 64, 64, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 128, 128, 64, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 128, 128, 256, 64, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 128, 128, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 128, 128, 128, 128, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 64, 64, 128, 512, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 128, 128, 256, 512, 1, 1, 0, 0, 2, 2),
+    Workload('float32', 'float32', 64, 64, 512, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 64, 64, 128, 128, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 64, 64, 512, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 64, 64, 256, 256, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 32, 32, 256, 1024, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 64, 64, 512, 1024, 1, 1, 0, 0, 2, 2),
+    Workload('float32', 'float32', 32, 32, 1024, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 32, 32, 256, 256, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 512, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 32, 32, 512, 512, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 16, 16, 512, 2048, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 2048, 1, 1, 0, 0, 2, 2),
+    Workload('float32', 'float32', 16, 16, 2048, 512, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 16, 16, 512, 512, 3, 3, 1, 1, 1, 1),
+    # SSD Resnet50_v2 others 23-42
+    # layer2
+    Workload('float32', 'float32', 16, 16, 2048, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 16, 16, 256, 512, 3, 3, 1, 1, 2, 2),
+    # layer3
+    Workload('float32', 'float32', 8, 8, 512, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 8, 8, 128, 256, 3, 3, 1, 1, 2, 2),
+    # layer4
+    Workload('float32', 'float32', 4, 4, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 4, 4, 128, 256, 3, 3, 1, 1, 2, 2),
+    # layer5
+    Workload('float32', 'float32', 2, 2, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 2, 2, 128, 128, 3, 3, 1, 1, 2, 2),
+    # loc_preds
+    Workload('float32', 'float32', 32, 32, 1024, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 2048, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 512, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 1, 1, 128, 16, 3, 3, 1, 1, 1, 1),
+    # cls_preds
+    Workload('float32', 'float32', 32, 32, 1024, 84, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 2048, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 512, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 84, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 1, 1, 128, 84, 3, 3, 1, 1, 1, 1),
+    
+"""
+    Workload('float32', 'float32', 32, 32, 1024, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 2048, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 2048, 256, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 16, 16, 256, 512, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 8, 8, 512, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 512, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 8, 8, 128, 256, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 4, 4, 256, 24, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 4, 4, 128, 256, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 2, 2, 256, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 128, 1, 1, 0, 0, 1, 1),
+    Workload('float32', 'float32', 2, 2, 128, 128, 3, 3, 1, 1, 2, 2),
+    Workload('float32', 'float32', 1, 1, 128, 16, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 32, 32, 1024, 84, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 16, 16, 2048, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 8, 8, 512, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 4, 4, 256, 126, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 2, 2, 256, 84, 3, 3, 1, 1, 1, 1),
+    Workload('float32', 'float32', 1, 1, 128, 84, 3, 3, 1, 1, 1, 1),
+
+
     # SSD VGG16 512 * 512 0-11
     Workload('float32', 'float32', 512, 512, 3, 64, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 512, 512, 64, 64, 3, 3, 1, 1, 1, 1),
@@ -64,7 +139,7 @@ _WORKLOADS = [
     Workload('float32', 'float32', 8, 8, 256, 126, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 4, 4, 256, 126, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 2, 2, 256, 84, 3, 3, 1, 1, 1, 1),
-"""
+
     Workload('float32', 'float32', 512, 512, 3, 64, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 512, 512, 64, 64, 3, 3, 1, 1, 1, 1),
     Workload('float32', 'float32', 256, 256, 64, 128, 3, 3, 1, 1, 1, 1),
@@ -95,6 +170,59 @@ _WORKLOADS = [
 ]
 
 _SCHEDULES = [
+    # SSD Resnet50
+    AVX512ConvCommonFwd(ic_bn=3, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=1, ow_factor=8),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=4),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=16),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=4),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=1, ow_factor=8),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=4),
+    AVX512Conv1x1Fwd(ic_bn=128, oc_bn=32, oh_factor=2, ow_factor=16),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=32, oh_factor=2, ow_factor=2),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=16),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=4),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=1, ow_factor=8),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=256, oc_bn=32, oh_factor=1, ow_factor=8),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=32, oh_factor=2, ow_factor=4),
+    AVX512Conv1x1Fwd(ic_bn=512, oc_bn=32, oh_factor=2, ow_factor=4),
+    AVX512Conv1x1Fwd(ic_bn=512, oc_bn=32, oh_factor=1, ow_factor=8),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=32, reg_n=8, unroll_kw=True),
+    # SSD Resnet50 other
+    # Layer 2
+    AVX512Conv1x1Fwd(ic_bn=32, oc_bn=64, oh_factor=2, ow_factor=2),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=64, reg_n=4, unroll_kw=True),
+    # Layer 3
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=16, oh_factor=1, ow_factor=8),
+    AVX512ConvCommonFwd(ic_bn=16, oc_bn=64, reg_n=4, unroll_kw=True),
+    # Layer 4
+    AVX512Conv1x1Fwd(ic_bn=64, oc_bn=4, oh_factor=2, ow_factor=4),
+    AVX512ConvCommonFwd(ic_bn=4, oc_bn=128, reg_n=2, unroll_kw=False),
+    # Layer 5
+    AVX512Conv1x1Fwd(ic_bn=128, oc_bn=128, oh_factor=2, ow_factor=2),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=128, reg_n=1, unroll_kw=True),
+    # loc_preds
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=16, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=12, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=12, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=6, reg_n=4, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=8, reg_n=2, unroll_kw=False),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=16, reg_n=1, unroll_kw=True),
+    # cls_preds
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=14, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=32, oc_bn=14, reg_n=16, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=8, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=4, unroll_kw=True),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=12, reg_n=2, unroll_kw=False),
+    AVX512ConvCommonFwd(ic_bn=128, oc_bn=4, reg_n=1, unroll_kw=False),
+    
+"""
     # SSD VGG16
     AVX512ConvCommonFwd(ic_bn=3, oc_bn=16, reg_n=64, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=16, oc_bn=32, reg_n=8, unroll_kw=True),
@@ -136,7 +264,7 @@ _SCHEDULES = [
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=8, unroll_kw=False),
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=4, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=14, reg_n=2, unroll_kw=True),
-"""
+
     AVX512ConvCommonFwd(ic_bn=3, oc_bn=8, reg_n=64, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=64, oc_bn=16, reg_n=16, unroll_kw=True),
     AVX512ConvCommonFwd(ic_bn=8, oc_bn=16, reg_n=16, unroll_kw=True),
@@ -363,4 +491,21 @@ def infer_shape_transpose(attrs, in_shapes, p_in_shapes, p_out_shapes):
             axis += (i,)
     out_shape = tuple([ishape[i].value for i in list(axis)])
     reg.assign_shape(p_out_shapes, 0, False, out_shape)
+    return True
+
+@reg.register_infershape("batch_norm", level=20)
+def infer_shape_batchnorm(attrs, in_shapes, p_in_shapes, p_out_shapes):
+    axis = attrs.get_int("axis")
+    dshape = in_shapes[0]
+    bshape = (dshape[axis].value,) if len(dshape) < 5 else (dshape[axis].value, dshape[len(dshape) - 1].value)
+
+    reg.assign_shape(p_in_shapes, 1, True, bshape)
+    reg.assign_shape(p_in_shapes, 2, True, bshape)
+    reg.assign_shape(p_in_shapes, 3, True, bshape)
+    reg.assign_shape(p_in_shapes, 4, True, bshape)
+
+    reg.assign_shape(p_out_shapes, 0, False, dshape)
+    reg.assign_shape(p_out_shapes, 1, False, bshape)
+    reg.assign_shape(p_out_shapes, 2, False, bshape)
+
     return True
