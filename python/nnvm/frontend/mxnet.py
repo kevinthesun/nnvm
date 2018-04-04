@@ -71,7 +71,7 @@ def _batch_norm(inputs, attrs):
     new_attrs['axis'] = attrs.get('axis', 1)
     new_attrs['epsilon'] = attrs.get('eps', 0.001)
     new_attrs['center'] = True
-    new_attrs['scale'] = True
+    new_attrs['scale'] = not _parse_bool_str(attrs, 'fix_gamma', default="False")
     return _get_nnvm_op(op_name)(*inputs, **new_attrs)
 
 def _concat(inputs, attrs):
@@ -195,6 +195,22 @@ def _upsampling(inputs, attrs):
     new_attrs = {'scale':int(scale)}
     return _get_nnvm_op('upsampling')(inputs[0], **new_attrs)
 
+def _contrib_MultiBoxDetection(inputs, attrs):
+    clip = _parse_bool_str(attrs, 'clip', default='True')
+    threshold = attrs.get('threshold') or 0.01
+    nms_threshold = attrs.get('nms_threshold') or 0.5
+    force_suppress = _parse_bool_str(attrs, 'force_suppress', default='False')
+    variances = tuple([float(x.strip()) for x in attrs.get('variances').strip('()').split(',')]) \
+        if attrs.get('variances') is not None else (0.1, 0.1, 0.2, 0.2)
+    nms_topk = attrs.get('nms_topk') or -1
+    new_attrs = {'clip': clip, 'threshold': float(threshold),
+                 'nms_threshold': float(nms_threshold),
+                 'force_suppress': force_suppress,
+                 'variances': variances, 'nms_topk': int(nms_topk)}
+    return _get_nnvm_op('multibox_detection')(inputs[0],inputs[1],
+                                              inputs[2], **new_attrs)
+
+
 
 _identity_list = ['__add_scalar__', '__add_symbol__', '__div_scalar__',
                   '__div_symbol__', '__mul_scalar__', '__mul_symbol__',
@@ -214,6 +230,7 @@ _convert_map = {
     '_rdiv_scalar'  : _rename('__rdiv_scalar__'),
     '_rminus_scalar': _rename('__rsub_scalar__'),
     '_contrib_MultiBoxPrior' : _rename('multibox_prior'),
+    '_contrib_MultiBoxDetection' : _contrib_MultiBoxDetection,
     'Activation'    : _activations,
     'BatchNorm'     : _batch_norm,
     'BatchNorm_v1'  : _batch_norm,

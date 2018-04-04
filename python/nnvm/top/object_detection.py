@@ -27,3 +27,26 @@ def compute_conv2d(attrs, inputs, _):
                                           steps, offsets, clip)
 
 reg.register_pattern("multibox_prior", OpPattern.OPAQUE)
+
+# multibox_detection
+@reg.register_schedule("multibox_detection")
+def schedule_multibox_detection(_, outs, target):
+    """Schedule definition of multibox_detection"""
+    with tvm.target.create(target):
+        return topi.generic.schedule_multibox_detection(outs)
+
+@reg.register_compute("multibox_detection")
+def compute_multibox_detection(attrs, inputs, _):
+    """Compute definition of multibox_detection"""
+    clip = attrs.get_bool('clip')
+    threshold = attrs.get_float('threshold')
+    nms_threshold = attrs.get_float('nms_threshold')
+    force_suppress = attrs.get_bool('force_suppress')
+    variance = attrs.get_float_tuple('variances')
+    nms_topk = attrs.get_int('nms_topk')
+
+    return topi.vision.ssd.multibox_detection(inputs[0], inputs[1], inputs[2],
+                                              clip, threshold, nms_threshold,
+                                              force_suppress, variance, nms_topk)
+
+reg.register_pattern("multibox_detection", OpPattern.OPAQUE)
