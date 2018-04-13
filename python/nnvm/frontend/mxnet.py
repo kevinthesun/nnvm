@@ -210,6 +210,14 @@ def _contrib_MultiBoxDetection(inputs, attrs):
     return _get_nnvm_op('multibox_detection')(inputs[0],inputs[1],
                                               inputs[2], **new_attrs)
 
+def _crop_like(inputs, _):
+    if len(inputs) < 2:
+        raise RuntimeError("Only support crop_like pattern.")
+    return _get_nnvm_op('crop_like')(inputs[0], inputs[1])
+
+def _elemwise_sum(inputs, _):
+    new_attrs = {'num_args':len(inputs)}
+    return _get_nnvm_op('elemwise_sum')(*inputs, **new_attrs)
 
 
 _identity_list = ['__add_scalar__', '__add_symbol__', '__div_scalar__',
@@ -231,6 +239,7 @@ _convert_map = {
     '_rminus_scalar': _rename('__rsub_scalar__'),
     '_contrib_MultiBoxPrior' : _rename('multibox_prior'),
     '_contrib_MultiBoxDetection' : _contrib_MultiBoxDetection,
+    'add_n'         : _elemwise_sum,
     'Activation'    : _activations,
     'BatchNorm'     : _batch_norm,
     'BatchNorm_v1'  : _batch_norm,
@@ -238,6 +247,7 @@ _convert_map = {
     'Concat'        : _concat,
     'Convolution'   : _conv2d,
     'Convolution_v1': _conv2d,
+    'Crop'          : _crop_like,
     'Deconvolution' : _conv2d_transpose,
     'Dropout'       : _dropout,
     'Flatten'       : _rename('flatten'),
